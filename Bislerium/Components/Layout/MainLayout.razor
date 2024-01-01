@@ -6,7 +6,7 @@
     @if (_globalState.CurrentUser != null)
     {
         <div class="sidebar">
-            <NavMenu Username="@_globalState.CurrentUser.Username"  LogoutHandler="LogoutHandler" />
+            <NavMenu Username="@_globalState.CurrentUser.Username"  UserRole="@_globalState.CurrentUser.role" LogoutHandler="LogoutHandler" />
         </div>
     }
 
@@ -25,10 +25,10 @@
 @code {
     private GlobalState _globalState = new();
 
-    // protected override void OnInitialized()
-    // {
-    //     UsersService.SeedUsers();
-    // }
+    protected override void OnInitialized()
+    {
+        UserService.SeedUsers();
+    }
 
     private void LogoutHandler()
     {
