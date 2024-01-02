@@ -37,7 +37,7 @@ namespace Bislerium.Data
                     {
                         role = Role.Admin,
                         Username = SeedUsername,
-                        Password = SeedPassword
+                        Password = Utility.HasdPassword(SeedPassword)
                     }
                     );
                 if (!Directory.Exists(Utility.GetAppDirectoryPath()))
