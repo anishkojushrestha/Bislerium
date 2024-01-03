@@ -80,6 +80,14 @@
     private string _password { get; set; }
     private string _errMsg = "";
 
+    protected override void OnInitialized()
+    {
+        
+
+        _globalState.CurrentUser = null;
+        _errMsg = "";
+    } 
+
     private void SubmitLogin()
     {
         try
@@ -90,8 +98,8 @@
             User user = users.FirstOrDefault(x => x.Username == _username);
             if (user != null)
             {
-                var pass = Utility.HasdPassword(_password);
-                if (pass == user.Password)
+                var hashedPassword = Utility.HasdPassword(_password);
+                if (hashedPassword == user.Password)
                 {
                     _globalState.CurrentUser = user;
                     NavManager.NavigateTo("/counter");
@@ -109,6 +117,7 @@
         catch (Exception e)
         {
             _errMsg = e.Message;
+            Console.WriteLine(e);
         }
 
 

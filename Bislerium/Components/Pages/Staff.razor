@@ -1,0 +1,119 @@
+﻿@page "/staff"
+@using Bislerium.Data
+@using System.Text.Json
+@inject NavigationManager NavManager
+
+<div class="container">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#form">
+        Add Staff
+    </button>
+</div>
+
+<table id="myTable" class="display">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in _users)
+        {
+            <tr>
+                <td>@user.Username</td>
+                <td>@user.role</td>
+                <td>
+                    <button type="button" class="btn btn-danger" onclick="()=>DeleteStaff(staff)" >
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal fade" id="form" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="exampleModalLabel">Create Account</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form @onsubmit="staffSubmit">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" class="form-control" id="username" @bind="_username" placeholder="Enter Username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control" id="password" @bind="_password" placeholder="Password">
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select @bind="_role" class="form-select"  >
+                            <option>@Role.Admin</option>
+                            <option>@Role.Staff</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#myTable').DataTable();
+    });
+</script>
+@code {
+    [CascadingParameter]
+    private bool IsAddUserModalVisible { get; set; }
+    private string _username { get; set; }
+    private string _password { get; set; }
+    private List<User> _users { get; set; }
+    private Role _role { get; set; }
+    protected override void OnInitialized()
+    {
+        _users = UserService.GetAll();
+    }
+    private void staffSubmit()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(_username) && !string.IsNullOrEmpty(_password))
+            {
+                List<User> user = new List<User>();
+                user.Add(
+                    new User
+                        {
+                            role = _role,
+                            Username = _username,
+                            Password = Utility.HasdPassword(_password)
+                        }
+                    );
+                if (!Directory.Exists(Utility.GetAppDirectoryPath()))
+                {
+                    Directory.CreateDirectory(Utility.GetAppDirectoryPath());
+                }
+                var json = JsonSerializer.Serialize(user);
+                File.WriteAllText(Utility.GetAppUsersFilePath(), json);
+                NavManager.NavigateTo("/staff");
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+    
+
+
+}
