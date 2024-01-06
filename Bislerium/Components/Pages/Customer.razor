@@ -14,6 +14,7 @@
         <tr>
             <th>Name</th>
             <th>Number</th>
+            <th>Status</th>
             <th>Created At</th>
             @* <th>CreatedBy</th> *@
             <th>Actions</th>
@@ -25,6 +26,7 @@
             <tr>
                 <td>@data.Name</td>
                 <td>@data.Number</td>
+                <td>@data.Status</td>
                 <td>@data.CreatedAt.ToShortDateString()</td>
                 @* <td>@data.CreatedBy</td> *@
             <td>
@@ -52,6 +54,14 @@
                 <input type="text" class="form-control " @bind="_number" placeholder="Number" />
                 <label for="floatingPassword">Number</label>
             </div>
+            <div class="form-floating mb-3">
+                <select class="form-select" @bind="_status" >
+                    <option>Select Status</option>
+                    <option >Normal</option>
+                    <option >Member</option>
+                </select>
+                <label for="floatingPassword">Status</label>
+            </div>
             @if (!string.IsNullOrEmpty(_addUserErrorMessage))
             {
                 <AlertMessage Type="danger" Message="@_addUserErrorMessage" />
@@ -64,6 +74,7 @@
     private Guid? _id { get; set; } = null;
     private string _name { get; set; }
     private string _number { get; set; }
+    private string _status { get; set; }
     private GlobalState _globalState { get; set; }
     private bool _showAddCustomerDialog { get; set; }
     private List<Customers> _customer { get; set; }
@@ -107,6 +118,7 @@
                                     Name = _name,
                                     Number = _number,
                                     CreatedAt = DateTime.Now,
+                                    Status = _status,
                                 }
                             );
 
@@ -120,6 +132,7 @@
                         }
                         c.Name = _name;
                         c.Number = _number;
+                        c.Status = _status;
                     }
                     if (!Directory.Exists(Utility.GetAppDirectoryPath()))
                     {
@@ -152,6 +165,7 @@
         _dialogOkLabel = "Save";
         _name = cus.Name;
         _number = cus.Number;
+        _status = cus.Status;
         _id = cus.Id;
 
         _showAddCustomerDialog = true;

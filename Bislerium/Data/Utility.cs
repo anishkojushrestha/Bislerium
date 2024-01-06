@@ -69,6 +69,10 @@ namespace Bislerium.Data
         {
             return Path.Combine(GetAppDirectoryPath(), "Customers.json");
         }
+        public static string GetAppOrderFilePath()
+        {
+            return Path.Combine(GetAppDirectoryPath(), "Orders.json");
+        }
         public static void DeleteUsersFile()
         {
             string filePath = GetAppUsersFilePath();

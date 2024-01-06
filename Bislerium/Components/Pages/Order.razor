@@ -12,34 +12,43 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Price</th>
+            <th>Customer Name</th>
+            <th>Customer No.</th>
+            <th>Coffee</th>
+            <th>Add-Ins</th>
+            <th>Discount</th>
+            <th>Coffee Price</th>
+            <th>AddIns Price</th>
+            <th>Total</th>
             <th>Created At</th>
             @* <th>CreatedBy</th> *@
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        
+        @foreach(var data in _order)
+        {
+            <tr>
+                <td>@data.CustomerName</td>
+                <td>@data.CustomerNumber</td>
+                <td>@data.CoffeeName</td>
+                <td>@data.AddInsName</td>
+                <td>@data.Discount</td>
+                <td>@data.CoffeePrice</td>
+                <td>@data.AddInsPrice</td>
+                <td>@data.TotalPrice</td>
+                <td>@data.CreatedAt.ToShortDateString()</td>
+            </tr>
+        }
     </tbody>
 </table>
 @if (_showAddOrderDialog)
 {
     <ModalDialog Title="Add User" OnClose="@OnAddOrderDialogClose" OkLabel="Add">
         <form>
-            <div class="form-floating mb-3">
-                @* <input type="text" class="form-control " @bind="_name" placeholder="Name" /> *@
-                <select class="form-select">
-                    <option>select customer</option>
-                    @foreach(var c in _customer)
-                    {
-                        <option value="@c.Number" >@c.Name</option>
-                    }
-                </select>
-                <label for="floatingInput">Customer</label>
-            </div>
+            
             <div class="form-floating mb-1">
-                <select class="form-select" @onchange="CoffCalculate" value="@_coff">
+                <select class="form-select" @onchange="CoffCalculate" value="@_coffName">
                     <option >select Coffee</option>
                     @foreach (var c in _coffee)
                     {
@@ -49,7 +58,7 @@
                 <label for="floatingPassword">Coffee</label>
             </div>
             <div class="form-floating mb-1">
-                <select class="form-select" @onchange="AddInCalculate">
+                <select class="form-select" @onchange="AddInCalculate" value="@_addInName">
                     <option>select Add-Ins</option>
                     @foreach (var c in _addins)
                     {
@@ -58,11 +67,24 @@
                 </select>
                 <label for="floatingPassword">Add-Ins</label>
             </div>
+            <div class="form-floating mb-3">
+                @* <input type="text" class="form-control " @bind="_name" placeholder="Name" /> *@
+                <select class="form-select" @onchange="CustomerCalculate">
+                    <option>select customer</option>
+                    @foreach (var c in _customer)
+                    {
+                        <option value="@c.Number">@c.Name</option>
+                    }
+                </select>
+                <label for="floatingInput">Customer</label>
+            </div>
             <div style="text-align:right;">
                <label>Coffee Price: @CoffCal</label><br>
                <label>Add-Ins Price: @AddInCal</label><br>
+               <label>Discount: @_discount</label><br>
                <label>Total: @Total</label>
             </div>
+            
 
             @if (!string.IsNullOrEmpty(_addUserErrorMessage))
             {
@@ -74,9 +96,12 @@
 }
 @code {
     private Guid? _id { get; set; } = null;
-    private string _name { get; set; }
-    private string _coff { get; set; }
-    private string _price { get; set; }
+    private string _cusName { get; set; }
+    private string _cusNumber { get; set; }
+    private string _coffName { get; set; }
+    private string _discount { get; set; } = "0%";
+    private string _status { get; set; }
+    private string _addInName { get; set; }
     private GlobalState _globalState { get; set; }
     private bool _showAddOrderDialog { get; set; }
     private List<Coffees> _coffee { get; set; }
@@ -85,22 +110,21 @@
     private string _dialogOkLabel { get; set; }
     private List<Customers> _customer { get; set; }
     private List<AddIns> _addins { get; set; }
-    // private List<Order> _order { get; set; }
+    private List<Orders> _order { get; set; }
     Decimal CoffCal = 0;
     Decimal AddInCal = 0;
     Decimal Total = 0;
     int Count = 0;
     protected override void OnInitialized()
     {
-        // _order = CoffeeService.GetAll();
+        _order =OrderService.GetAll();
 
 
     }
     private void OpenAddCoffeeDialog()
     {
         _showAddOrderDialog = true;
-        _name = "";
-        _price = "";
+
         _id = null;
         _customer = CustomerService.GetAll();
         _coffee = CoffeeService.GetAll();
@@ -119,17 +143,23 @@
             try
             {
                 _addUserErrorMessage = "";
-                if (!string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(_price.ToString()))
+                if (!string.IsNullOrEmpty(_cusName) && !string.IsNullOrEmpty(_coffName.ToString()))
                 {
-                    List<Coffees> coffee = CoffeeService.GetAll();
+                    List<Orders> ord = OrderService.GetAll();
                     if (string.IsNullOrEmpty(_id.ToString()))
                     {
 
-                        coffee.Add(
-                            new Coffees
+                        ord.Add(
+                            new Orders
                                 {
-                                    Name = _name,
-                                    Price = _price,
+                                    CustomerName = _cusName,
+                                    CustomerNumber = _cusNumber,
+                                    Discount = _discount,
+                                    CoffeeName = _coffName,
+                                    AddInsName = _addInName,
+                                    CoffeePrice = CoffCal.ToString(),
+                                    AddInsPrice = AddInCal.ToString(),
+                                    TotalPrice = Total.ToString("0"),
                                     CreatedAt = DateTime.Now,
                                 }
                             );
@@ -137,23 +167,28 @@
                     }
                     else
                     {
-                        Coffees c = coffee.FirstOrDefault(x => x.Id == _id);
-                        if (c == null)
-                        {
-                            throw new Exception("Coffee not found.");
-                        }
-                        c.Name = _name;
-                        c.Price = _price;
+                        // Coffees c = coffee.FirstOrDefault(x => x.Id == _id);
+                        // if (c == null)
+                        // {
+                        //     throw new Exception("Coffee not found.");
+                        // }
+                        // c.Name = _name;
+                        // c.Price = _price;
                     }
                     if (!Directory.Exists(Utility.GetAppDirectoryPath()))
                     {
                         Directory.CreateDirectory(Utility.GetAppDirectoryPath());
                     }
 
-                    var json = JsonSerializer.Serialize(coffee);
-                    File.WriteAllText(Utility.GetAppCoffeeFilePath(), json);
-                    _coffee = CoffeeService.GetAll();
+                    var json = JsonSerializer.Serialize(ord);
+                    File.WriteAllText(Utility.GetAppOrderFilePath(), json);
+                    _order = OrderService.GetAll();
                     _showAddOrderDialog = false;
+                    CoffCal = 0;
+                    AddInCal = 0;
+                    Total = 0;
+                    _discount = "0%";
+                    Count = 0;
                 }
                 else
                 {
@@ -174,8 +209,8 @@
     {
         _dialogTitle = "Edit Todo";
         _dialogOkLabel = "Save";
-        _name = coff.Name;
-        _price =coff.Price;
+        // _name = coff.Name;
+        // _price =coff.Price;
         _id = coff.Id;
 
         _showAddOrderDialog = true;
@@ -210,24 +245,42 @@
 
     }
 
-    // private void CustomerCalculate(ChangeEventArgs e)
-    // {
-    //     List<> C = CustomerService.GetAll();
-    //     string searchValue = e.Value.ToString().Trim();
-    //     var count = C.Count(x => x.Number == searchValue);
+    private void CustomerCalculate(ChangeEventArgs e)
+    {
+        _cusNumber = e.Value.ToString().Trim();
+        List<Customers> cus = CustomerService.GetAll();
+        Customers c = cus.FirstOrDefault(x => x.Number == _cusNumber);
+        List<Orders> ord = OrderService.GetAll();
+        int o = ord.Count(x => x.CustomerNumber == _cusNumber);
+        _cusName = c.Name;
+        _status = c.Status;
+        decimal Sum = CoffCal + AddInCal;
+        if(0 == 10)
+        {
+            _discount = "Purchase 10 coffee";
+            Total = 0;
+        }
+        else
+        {
+            if (_status == "Member")
+            {
+                _discount = "10%";
+                decimal discountAmount = 10m / 100m;
+                Total = Sum - (discountAmount * Sum);
+            }
+            else
+            {
+                _discount = "0%";
+                Total = Sum;
+            }
+        }
+        
 
-    //     if (data != null)
-    //     {
-    //         string num = data.Number;
 
-    //         CoffCal = price;
-    //         Total = CoffCal + AddInCal;
-    //     }
-
-
-    // }
+    }
     private void CoffCalculate(ChangeEventArgs e)
     {
+        _coffName = e.Value.ToString().Trim();
         List<Coffees> Coffe = CoffeeService.GetAll();
         string searchValue = e.Value.ToString().Trim();
         Coffees data = Coffe.FirstOrDefault(x => x.Name == searchValue);
@@ -235,13 +288,14 @@
         {
             decimal price = Convert.ToDecimal(data.Price);
             CoffCal = price;
-            Total = CoffCal + AddInCal;
+            
         }
 
 
     }
     private void AddInCalculate(ChangeEventArgs e)
     {
+        _addInName = e.Value.ToString().Trim();
         List<AddIns> a = AddInsService.GetAll();
         string searchValue = e.Value.ToString().Trim();
         AddIns data = a.FirstOrDefault(x => x.Name == searchValue);
@@ -249,7 +303,7 @@
         {
             decimal price = Convert.ToDecimal(data.Price);
             AddInCal = price;
-            Total = CoffCal + AddInCal;
+            
         }
     }
 }
