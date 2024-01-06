@@ -1,11 +1,11 @@
-﻿@page "/customers"
+﻿@page "/add-ins"
 @using Bislerium.Data
 @using System.Text.Json
 
 
 <nav class="navbar navbar-light bg-light justify-content-between">
-    <h1 class="navbar-brand mb-0 h1">Customer</h1>
-    <button class="btn btn-primary" type="button" @onclick="OpenAddCustomerDialog">
+    <h1 class="navbar-brand mb-0 h1">Add-Ins</h1>
+    <button class="btn btn-primary" type="button" @onclick="OpenAddinsDialog">
         <span class="oi oi-plus" /> Add
     </button>
 </nav>
@@ -13,26 +13,26 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Number</th>
+            <th>Price</th>
             <th>Created At</th>
             @* <th>CreatedBy</th> *@
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var data in _customer)
+        @foreach (var data in _addins)
         {
             <tr>
                 <td>@data.Name</td>
-                <td>@data.Number</td>
+                <td>@data.Price</td>
                 <td>@data.CreatedAt.ToShortDateString()</td>
                 @* <td>@data.CreatedBy</td> *@
             <td>
             <button class="btn btn-outline-secondary" type="button"
-                            @onclick="()=>OpenEditCustomerDialog(data)">
+                            @onclick="()=>OpenEditAddInsDialog(data)">
             <span class="oi oi-pencil" /> Edit
             </button>
-                    <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteCustomerDialog(data)">
+                    <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteAddInsDialog(data)">
             <span class="oi oi-delete" /> Delete
             </button>
             </td>
@@ -40,17 +40,17 @@
         }
     </tbody>
 </table>
-@if (_showAddCustomerDialog)
+@if (_showAddCofeeDialog)
 {
-    <ModalDialog Title="Add User" OnClose="@OnAddCustomerDialogClose" OkLabel="Add">
+    <ModalDialog Title="Add User" OnClose="@OnAddInsDialogClose" OkLabel="Add">
         <form>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control " @bind="_name" placeholder="Name" />
                 <label for="floatingInput">Name</label>
             </div>
             <div class="form-floating mb-3">
-                <input type="text" class="form-control " @bind="_number" placeholder="Number" />
-                <label for="floatingPassword">Number</label>
+                <input type="text" class="form-control " @bind="_price" placeholder="Price" />
+                <label for="floatingPassword">Price</label>
             </div>
             @if (!string.IsNullOrEmpty(_addUserErrorMessage))
             {
@@ -63,49 +63,49 @@
 @code {
     private Guid? _id { get; set; } = null;
     private string _name { get; set; }
-    private string _number { get; set; }
+    private string _price { get; set; }
     private GlobalState _globalState { get; set; }
-    private bool _showAddCustomerDialog { get; set; }
-    private List<Customers> _customer { get; set; }
+    private bool _showAddCofeeDialog { get; set; }
+    private List<AddIns> _addins { get; set; }
     private string _addUserErrorMessage { get; set; }
     private string _dialogTitle { get; set; }
     private string _dialogOkLabel { get; set; }
 
     protected override void OnInitialized()
     {
-        _customer = CustomerService.GetAll();
+        _addins = AddInsService.GetAll();
     }
-    private void OpenAddCustomerDialog()
+    private void OpenAddinsDialog()
     {
-        _showAddCustomerDialog = true;
+        _showAddCofeeDialog = true;
         _name = "";
-        _number = "";
+        _price = "";
         _id = null;
 
     }
-    private void OnAddCustomerDialogClose(bool isCancel)
+    private void OnAddInsDialogClose(bool isCancel)
     {
         if (isCancel)
         {
 
-            _showAddCustomerDialog = false;
+            _showAddCofeeDialog = false;
         }
         else
         {
             try
             {
                 _addUserErrorMessage = "";
-                if (!string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(_number.ToString()))
+                if (!string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(_price.ToString()))
                 {
-                    List<Customers> cus = CustomerService.GetAll();
+                    List<AddIns> addin = AddInsService.GetAll();
                     if (string.IsNullOrEmpty(_id.ToString()))
                     {
 
-                        cus.Add(
-                            new Customers
+                        addin.Add(
+                            new AddIns
                                 {
                                     Name = _name,
-                                    Number = _number,
+                                    Price = _price,
                                     CreatedAt = DateTime.Now,
                                 }
                             );
@@ -113,23 +113,23 @@
                     }
                     else
                     {
-                        Customers c = cus.FirstOrDefault(x => x.Id == _id);
+                        AddIns c = addin.FirstOrDefault(x => x.Id == _id);
                         if (c == null)
                         {
-                            throw new Exception("Customer not found.");
+                            throw new Exception("Coffee not found.");
                         }
                         c.Name = _name;
-                        c.Number = _number;
+                        c.Price = _price;
                     }
                     if (!Directory.Exists(Utility.GetAppDirectoryPath()))
                     {
                         Directory.CreateDirectory(Utility.GetAppDirectoryPath());
                     }
 
-                    var json = JsonSerializer.Serialize(cus);
-                    File.WriteAllText(Utility.GetAppCustomerFilePath(), json);
-                    _customer = CustomerService.GetAll();
-                    _showAddCustomerDialog = false;
+                    var json = JsonSerializer.Serialize(addin);
+                    File.WriteAllText(Utility.GetAppAddInsFilePath(), json);
+                    _addins = AddInsService.GetAll();
+                    _showAddCofeeDialog = false;
                 }
                 else
                 {
@@ -146,26 +146,26 @@
         }
     }
 
-    private void OpenEditCustomerDialog(Customers cus)
+    private void OpenEditAddInsDialog(AddIns ad)
     {
         _dialogTitle = "Edit Todo";
         _dialogOkLabel = "Save";
-        _name = cus.Name;
-        _number = cus.Number;
-        _id = cus.Id;
+        _name = ad.Name;
+        _price =ad.Price;
+        _id = ad.Id;
 
-        _showAddCustomerDialog = true;
+        _showAddCofeeDialog = true;
     }
-    private void OpenDeleteCustomerDialog(Customers a)
+    private void OpenDeleteAddInsDialog(AddIns a)
     {
         try
         {
-            List<Customers> ad = CustomerService.GetAll();
+            List<AddIns> ad = AddInsService.GetAll();
             _id = a.Id;
-            Customers c = ad.FirstOrDefault(x => x.Id == _id);
+            AddIns c = ad.FirstOrDefault(x => x.Id == _id);
             if (c == null)
             {
-                throw new Exception("Customer not found.");
+                throw new Exception("Coffee not found.");
             }
             ad.Remove(c);
             if (!Directory.Exists(Utility.GetAppDirectoryPath()))
@@ -174,8 +174,8 @@
             }
 
             var json = JsonSerializer.Serialize(ad);
-            File.WriteAllText(Utility.GetAppCustomerFilePath(), json);
-            _customer = CustomerService.GetAll();
+            File.WriteAllText(Utility.GetAppAddInsFilePath(), json);
+            _addins = AddInsService.GetAll();
 
         }
         catch

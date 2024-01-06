@@ -1,5 +1,127 @@
-﻿<h3>Users</h3>
+﻿@page "/users"
+@using Bislerium.Data
+@inject NavigationManager NavManager
+@using System.Text.Json
+<nav class="navbar navbar-light bg-light justify-content-between">
+    <h1 class="navbar-brand mb-0 h1">Users</h1>
+    <button class="btn btn-primary" type="button" @onclick="OpenAddUserDialog">
+        <span class="oi oi-plus" /> Add
+    </button>
+</nav>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Created At</th>
+            <th>CreatedBy</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in _users)
+        {
+            <tr>
+                <td>@user.Username</td>
+                @* <td>@user.Role.ToString()</td>
+                <td>
+                    @{
+                        var creator = UsersService.GetById(user.CreatedBy);
+                        <span>@(creator == null ? "Unknown" : creator.Username)</span>
+                    }
+                </td> *@
+                @* <td>
+                    <button disabled="@(_globalState.CurrentUser != null ? _globalState.CurrentUser.Id == user.Id : false)"
+                            class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteUserDialog(user)">
+                        <span class="oi oi-delete" /> Delete
+                    </button>
+                </td> *@
+            </tr>
+        }
+    </tbody>
+</table>
+@if (_showAddUserDialog)
+{
+    <ModalDialog Title="Add User" OnClose="@OnAddUserDialogClose" OkLabel="Add">
+        <form>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control username" @bind="_username" placeholder="Username" />
+                <label for="floatingInput">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control password" @bind="_password" placeholder="Password" />
+                <label for="floatingPassword">Password</label>
+            </div> 
+            <div class="form-floating mb-3">
+                <select @bind="_role" class="form-select">
+                    <option>@Role.Admin</option>
+                    <option>@Role.Staff</option>
+                </select>
+                <label for="Role">Role</label>
+            </div>
 
+        </form>
+    </ModalDialog>
+}
 @code {
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
+    private bool _showAddUserDialog { get; set; }
+    private string _username { get; set; }
+    private string _password { get; set; }
+    private List<User> _users { get; set; }
+    private Role _role { get; set; }
+    protected override void OnInitialized()
+    {
+        _users = UserService.GetAll();
+    }
+    private void OpenAddUserDialog()
+    {
+        _showAddUserDialog = true;
+
+    }
+    private void OnAddUserDialogClose(bool isCancel)
+    {
+        if (isCancel)
+        {
+
+            _showAddUserDialog = false;
+        }
+        else
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(_username) && !string.IsNullOrEmpty(_password))
+                {
+                    List<User> user = UserService.GetAll();
+                    user.Add(
+                        new User
+                            {
+                                role = _role,
+                                Username = _username,
+                                Password = Utility.HasdPassword(_password)
+                            }
+                        );
+                    if (!Directory.Exists(Utility.GetAppDirectoryPath()))
+                    {
+                        Directory.CreateDirectory(Utility.GetAppDirectoryPath());
+                    }
+
+                    var json = JsonSerializer.Serialize(user);
+                    File.WriteAllText(Utility.GetAppUsersFilePath(), json);
+                    _users = UserService.GetAll();
+                    _showAddUserDialog = false;
+                }
+                // _addUserErrorMessage = "";
+                
+                
+            }
+            catch (Exception e)
+            {
+                // _addUserErrorMessage = e.Message;
+            }
+        }
+    }
+    
 
 }

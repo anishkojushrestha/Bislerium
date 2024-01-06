@@ -1,5 +1,188 @@
-﻿<h3>Coffee</h3>
+﻿@page "/coffee"
+@using Bislerium.Data
+@using System.Text.Json
 
+
+<nav class="navbar navbar-light bg-light justify-content-between">
+    <h1 class="navbar-brand mb-0 h1">Coffee</h1>
+    <button class="btn btn-primary" type="button" @onclick="OpenAddCoffeeDialog">
+        <span class="oi oi-plus" /> Add
+    </button>
+</nav>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Created At</th>
+            @* <th>CreatedBy</th> *@
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var data in _coffee)
+        {
+            <tr>
+                <td>@data.Name</td>
+                <td>@data.Price</td>
+                <td>@data.CreatedAt.ToShortDateString()</td>
+                @* <td>@data.CreatedBy</td> *@
+            <td>
+            <button class="btn btn-outline-secondary" type="button"
+                            @onclick="()=>OpenEditCoffeeDialog(data)">
+            <span class="oi oi-pencil" /> Edit
+            </button>
+                    <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteCoffeeDialog(data)">
+            <span class="oi oi-delete" /> Delete
+            </button>
+            </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@if (_showAddCofeeDialog)
+{
+    <ModalDialog Title="Add User" OnClose="@OnAddCoffeeDialogClose" OkLabel="Add">
+        <form>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control " @bind="_name" placeholder="Name" />
+                <label for="floatingInput">Name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control " @bind="_price" placeholder="Price" />
+                <label for="floatingPassword">Price</label>
+            </div>
+            @if (!string.IsNullOrEmpty(_addUserErrorMessage))
+            {
+                <AlertMessage Type="danger" Message="@_addUserErrorMessage" />
+            }
+
+        </form>
+    </ModalDialog>
+}
 @code {
+    private Guid? _id { get; set; } = null;
+    private string _name { get; set; }
+    private string _price { get; set; }
+    private GlobalState _globalState { get; set; }
+    private bool _showAddCofeeDialog { get; set; }
+    private List<Coffees> _coffee { get; set; }
+    private string _addUserErrorMessage { get; set; }
+    private string _dialogTitle { get; set; }
+    private string _dialogOkLabel { get; set; }
 
+    protected override void OnInitialized()
+    {
+        _coffee = CoffeeService.GetAll();
+    }
+    private void OpenAddCoffeeDialog()
+    {
+        _showAddCofeeDialog = true;
+        _name = "";
+        _price = "";
+        _id = null;
+
+    }
+    private void OnAddCoffeeDialogClose(bool isCancel)
+    {
+        if (isCancel)
+        {
+
+            _showAddCofeeDialog = false;
+        }
+        else
+        {
+            try
+            {
+                _addUserErrorMessage = "";
+                if (!string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(_price.ToString()))
+                {
+                    List<Coffees> coffee = CoffeeService.GetAll();
+                    if (string.IsNullOrEmpty(_id.ToString()))
+                    {
+
+                        coffee.Add(
+                            new Coffees
+                                {
+                                    Name = _name,
+                                    Price = _price,
+                                    CreatedAt = DateTime.Now,
+                                }
+                            );
+
+                    }
+                    else
+                    {
+                        Coffees c = coffee.FirstOrDefault(x => x.Id == _id);
+                        if (c == null)
+                        {
+                            throw new Exception("Coffee not found.");
+                        }
+                        c.Name = _name;
+                        c.Price = _price;
+                    }
+                    if (!Directory.Exists(Utility.GetAppDirectoryPath()))
+                    {
+                        Directory.CreateDirectory(Utility.GetAppDirectoryPath());
+                    }
+
+                    var json = JsonSerializer.Serialize(coffee);
+                    File.WriteAllText(Utility.GetAppCoffeeFilePath(), json);
+                    _coffee = CoffeeService.GetAll();
+                    _showAddCofeeDialog = false;
+                }
+                else
+                {
+                    throw new Exception("name or price are empty");
+                }
+
+
+
+            }
+            catch (Exception e)
+            {
+                _addUserErrorMessage = e.Message;
+            }
+        }
+    }
+
+    private void OpenEditCoffeeDialog(Coffees coff)
+    {
+        _dialogTitle = "Edit Todo";
+        _dialogOkLabel = "Save";
+        _name = coff.Name;
+        _price =coff.Price;
+        _id = coff.Id;
+
+        _showAddCofeeDialog = true;
+    }
+    private void OpenDeleteCoffeeDialog(Coffees coff)
+    {
+        try
+        {
+            List<Coffees> coffee = CoffeeService.GetAll();
+            _id = coff.Id;
+            Coffees c = coffee.FirstOrDefault(x => x.Id == _id);
+            if (c == null)
+            {
+                throw new Exception("Coffee not found.");
+            }
+            coffee.Remove(c);
+            if (!Directory.Exists(Utility.GetAppDirectoryPath()))
+            {
+                Directory.CreateDirectory(Utility.GetAppDirectoryPath());
+            }
+
+            var json = JsonSerializer.Serialize(coffee);
+            File.WriteAllText(Utility.GetAppCoffeeFilePath(), json);
+            _coffee = CoffeeService.GetAll();
+
+        }
+        catch
+        {
+            
+        }
+       
+
+    }
 }
