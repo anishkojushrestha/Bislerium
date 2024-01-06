@@ -7,34 +7,42 @@
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
+<style>
+    .nav-item-custom {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1rem; 
+
+    }
+</style>
+
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="customers">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Customer
+        <div class="nav-item-custom">
+            <NavLink class="nav-link" href="customers" style="color: sandybrown;">
+                <span class="bi bi-person-fill" style="color: white;"></span> Customer
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="customerorder">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Customer Order
+        <div class="nav-item-custom">
+            <NavLink class="nav-link" href="customerorder" style="color: sandybrown;">
+                <span class="bi bi-clipboard2-check-fill" style="color: white;"></span> Customer Order
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="users">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Users
+        <div class="nav-item-custom">
+            <NavLink class="nav-link" href="users" style="color: sandybrown;">
+                <span class="bi bi-people-fill" style="color: white;"></span> Users
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="coffee">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Coffee
+        <div class="nav-item-custom" >
+            <NavLink class="nav-link" href="coffee" style="color: sandybrown;">
+                <span class="bi bi-cup-fill" style="color: white;"></span> Coffee
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="add-ins">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Add-ins
+        <div class="nav-item-custom">
+            <NavLink class="nav-link" href="add-ins" style="color: sandybrown;">
+                <span class="bi bi-plus-circle-fill" style="color: white;"></span> Add-ins
             </NavLink>
         </div>
-       
     </nav>
 </div>
 @code {
