@@ -58,9 +58,12 @@
                 </select>
                 <label for="floatingPassword">Add-Ins</label>
             </div>
-            <label>Coffee Price:@CoffCal</label>
-            <label>Add-Ins Price:@AddInCal</label>
-            <label>Total:@Total</label>
+            <div style="text-align:right;">
+               <label>Coffee Price: @CoffCal</label><br>
+               <label>Add-Ins Price: @AddInCal</label><br>
+               <label>Total: @Total</label>
+            </div>
+
             @if (!string.IsNullOrEmpty(_addUserErrorMessage))
             {
                 <AlertMessage Type="danger" Message="@_addUserErrorMessage" />
