@@ -16,13 +16,13 @@
             <th style ="width: 10%; white-space: nowrap;">Customer No.</th>
             <th>Coffee</th>
             <th style="width: 10%; white-space: nowrap;">Add-Ins</th>
-            <th>Discount</th>
+            <th>Dis</th>
             <th style="width: 10%; white-space: nowrap;">Coffee Price</th>
             <th style="width: 10%; white-space: nowrap;">AddIns Price</th>
-            <th>Total</th>
+           
             <th style="width: 10%; white-space: nowrap;">Created At</th>
             @* <th>CreatedBy</th> *@
-            <th>Actions</th>
+            @* <th>Actions</th> *@
         </tr>
     </thead>
     <tbody>
@@ -36,7 +36,6 @@
                 <td>@data.Discount</td>
                 <td>@data.CoffeePrice</td>
                 <td>@data.AddInsPrice</td>
-                <td>@data.TotalPrice</td>
                 <td>@data.CreatedAt.ToShortDateString()</td>
             </tr>
         }
@@ -48,8 +47,8 @@
         <form>
             
             <div class="form-floating mb-1">
-                <select class="form-select" @onchange="CoffCalculate" value="@_coffName">
-                    <option >select Coffee</option>
+                <select class="form-select" @onchange="CoffCalculate" >
+                    <option selected >select Coffee</option>
                     @foreach (var c in _coffee)
                     {
                         <option>@c.Name</option>
@@ -58,8 +57,8 @@
                 <label for="floatingPassword">Coffee</label>
             </div>
             <div class="form-floating mb-1">
-                <select class="form-select" @onchange="AddInCalculate" value="@_addInName">
-                    <option>select Add-Ins</option>
+                <select class="form-select" @onchange="AddInCalculate" >
+                    <option selected>select Add-Ins</option>
                     @foreach (var c in _addins)
                     {
                         <option>@c.Name</option>
@@ -70,7 +69,7 @@
             <div class="form-floating mb-3">
                 @* <input type="text" class="form-control " @bind="_name" placeholder="Name" /> *@
                 <select class="form-select" @onchange="CustomerCalculate">
-                    <option>select customer</option>
+                    <option selected>select customer</option>
                     @foreach (var c in _customer)
                     {
                         <option value="@c.Number">@c.Name</option>
@@ -159,7 +158,7 @@
                                     AddInsName = _addInName,
                                     CoffeePrice = CoffCal.ToString(),
                                     AddInsPrice = AddInCal.ToString(),
-                                    TotalPrice = Total.ToString("0"),
+                                    TotalPrice = Total.ToString(),
                                     CreatedAt = DateTime.Now,
                                 }
                             );
@@ -189,6 +188,9 @@
                     Total = 0;
                     _discount = "0%";
                     Count = 0;
+                    _cusName = "Select Customer";
+                    _coffName = "Select Coffee";
+                    _addInName = "Select AddIns";
                 }
                 else
                 {
@@ -255,9 +257,9 @@
         _cusName = c.Name;
         _status = c.Status;
         decimal Sum = CoffCal + AddInCal;
-        if(0 == 10)
+        if(o == 10)
         {
-            _discount = "Purchase 10 coffee";
+            _discount = "free";
             Total = 0;
         }
         else
