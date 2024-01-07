@@ -42,19 +42,19 @@
 </table>
 @if (_showAddCofeeDialog)
 {
-    <ModalDialog Title="Add User" OnClose="@OnAddCoffeeDialogClose" OkLabel="Add">
+    <ModalDialog Title="@_dialogTitle" OkLabel="@_dialogOkLabel" OnClose="@OnAddCoffeeDialogClose">
         <form>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control " @bind="_name" placeholder="Name" />
                 <label for="floatingInput">Name</label>
             </div>
             <div class="form-floating mb-3">
-                <input type="text" class="form-control " @bind="_price" placeholder="Price" />
+                <input type="number" class="form-control " @bind="_price" placeholder="Price" />
                 <label for="floatingPassword">Price</label>
             </div>
-            @if (!string.IsNullOrEmpty(_addUserErrorMessage))
+            @if (!string.IsNullOrEmpty(_addCoffErrorMessage))
             {
-                <AlertMessage Type="danger" Message="@_addUserErrorMessage" />
+                <AlertMessage Type="danger" Message="@_addCoffErrorMessage" />
             }
 
         </form>
@@ -67,7 +67,7 @@
     private GlobalState _globalState { get; set; }
     private bool _showAddCofeeDialog { get; set; }
     private List<Coffees> _coffee { get; set; }
-    private string _addUserErrorMessage { get; set; }
+    private string _addCoffErrorMessage { get; set; }
     private string _dialogTitle { get; set; }
     private string _dialogOkLabel { get; set; }
 
@@ -77,6 +77,8 @@
     }
     private void OpenAddCoffeeDialog()
     {
+        _dialogTitle = "Add Coffee";
+        _dialogOkLabel = "Add";
         _showAddCofeeDialog = true;
         _name = "";
         _price = "";
@@ -94,7 +96,7 @@
         {
             try
             {
-                _addUserErrorMessage = "";
+                _addCoffErrorMessage = "";
                 if (!string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(_price.ToString()))
                 {
                     List<Coffees> coffee = CoffeeService.GetAll();
@@ -141,15 +143,15 @@
             }
             catch (Exception e)
             {
-                _addUserErrorMessage = e.Message;
+                _addCoffErrorMessage = e.Message;
             }
         }
     }
 
     private void OpenEditCoffeeDialog(Coffees coff)
     {
-        _dialogTitle = "Edit Todo";
-        _dialogOkLabel = "Save";
+        _dialogTitle = "Edit Coffee";
+        _dialogOkLabel = "Update";
         _name = coff.Name;
         _price =coff.Price;
         _id = coff.Id;
@@ -178,9 +180,9 @@
             _coffee = CoffeeService.GetAll();
 
         }
-        catch
+        catch (Exception e)
         {
-            
+            _addCoffErrorMessage = e.Message;
         }
        
 

@@ -44,14 +44,14 @@
 </table>
 @if (_showAddCustomerDialog)
 {
-    <ModalDialog Title="Add User" OnClose="@OnAddCustomerDialogClose" OkLabel="Add">
+    <ModalDialog Title="@_dialogTitle" OkLabel="@_dialogOkLabel" OnClose="@OnAddCustomerDialogClose">
         <form>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control " @bind="_name" placeholder="Name" />
                 <label for="floatingInput">Name</label>
             </div>
             <div class="form-floating mb-3">
-                <input type="text" class="form-control " @bind="_number" placeholder="Number" />
+                <input type="number" class="form-control "  @bind="_number" placeholder="Number" />
                 <label for="floatingPassword">Number</label>
             </div>
             <div class="form-floating mb-3">
@@ -62,9 +62,9 @@
                 </select>
                 <label for="floatingPassword">Status</label>
             </div>
-            @if (!string.IsNullOrEmpty(_addUserErrorMessage))
+            @if (!string.IsNullOrEmpty(_addCustomerErrorMessage))
             {
-                <AlertMessage Type="danger" Message="@_addUserErrorMessage" />
+                <AlertMessage Type="danger" Message="@_addCustomerErrorMessage" />
             }
 
         </form>
@@ -78,7 +78,7 @@
     private GlobalState _globalState { get; set; }
     private bool _showAddCustomerDialog { get; set; }
     private List<Customers> _customer { get; set; }
-    private string _addUserErrorMessage { get; set; }
+    private string _addCustomerErrorMessage { get; set; }
     private string _dialogTitle { get; set; }
     private string _dialogOkLabel { get; set; }
 
@@ -88,6 +88,8 @@
     }
     private void OpenAddCustomerDialog()
     {
+        _dialogTitle = "Add Customer";
+        _dialogOkLabel = "Add";
         _showAddCustomerDialog = true;
         _name = "";
         _number = "";
@@ -105,23 +107,29 @@
         {
             try
             {
-                _addUserErrorMessage = "";
-                if (!string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(_number.ToString()))
+                _addCustomerErrorMessage = "";
+                if (!string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(_number.ToString()) && !string.IsNullOrEmpty(_status.ToString()))
                 {
                     List<Customers> cus = CustomerService.GetAll();
+                    Customers checkNumb = cus.FirstOrDefault(x => x.Number == _number);
+
                     if (string.IsNullOrEmpty(_id.ToString()))
                     {
-
-                        cus.Add(
-                            new Customers
+                        if (checkNumb == null) { 
+                            cus.Add(
+                                new Customers
                                 {
                                     Name = _name,
                                     Number = _number,
                                     CreatedAt = DateTime.Now,
                                     Status = _status,
                                 }
-                            );
-
+                                );
+                        }
+                        else
+                        {
+                            throw new Exception("Number already exist!!");
+                        }
                     }
                     else
                     {
@@ -146,7 +154,7 @@
                 }
                 else
                 {
-                    throw new Exception("name or price are empty");
+                    throw new Exception("name or Number or status are empty");
                 }
 
 
@@ -154,15 +162,15 @@
             }
             catch (Exception e)
             {
-                _addUserErrorMessage = e.Message;
+                _addCustomerErrorMessage = e.Message;
             }
         }
     }
 
     private void OpenEditCustomerDialog(Customers cus)
     {
-        _dialogTitle = "Edit Todo";
-        _dialogOkLabel = "Save";
+        _dialogTitle = "Edit Customer";
+        _dialogOkLabel = "Update";
         _name = cus.Name;
         _number = cus.Number;
         _status = cus.Status;
@@ -192,9 +200,9 @@
             _customer = CustomerService.GetAll();
 
         }
-        catch
+        catch (Exception e)
         {
-            
+            _addCustomerErrorMessage = e.Message;
         }
        
 

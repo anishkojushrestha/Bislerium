@@ -15,7 +15,6 @@
             <th>Name</th>
             <th>Price</th>
             <th>Created At</th>
-            @* <th>CreatedBy</th> *@
             <th>Actions</th>
         </tr>
     </thead>
@@ -26,7 +25,6 @@
                 <td>@data.Name</td>
                 <td>@data.Price</td>
                 <td>@data.CreatedAt.ToShortDateString()</td>
-                @* <td>@data.CreatedBy</td> *@
             <td>
             <button class="btn btn-outline-secondary" type="button"
                             @onclick="()=>OpenEditAddInsDialog(data)">
@@ -42,19 +40,19 @@
 </table>
 @if (_showAddCofeeDialog)
 {
-    <ModalDialog Title="Add User" OnClose="@OnAddInsDialogClose" OkLabel="Add">
+    <ModalDialog Title="@_dialogTitle" OnClose="@OnAddInsDialogClose" OkLabel="@_dialogOkLabel">
         <form>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control " @bind="_name" placeholder="Name" />
                 <label for="floatingInput">Name</label>
             </div>
             <div class="form-floating mb-3">
-                <input type="text" class="form-control " @bind="_price" placeholder="Price" />
+                <input type="number" class="form-control " @bind="_price" placeholder="Price" />
                 <label for="floatingPassword">Price</label>
             </div>
-            @if (!string.IsNullOrEmpty(_addUserErrorMessage))
+            @if (!string.IsNullOrEmpty(_addAddInsErrorMessage))
             {
-                <AlertMessage Type="danger" Message="@_addUserErrorMessage" />
+                <AlertMessage Type="danger" Message="@_addAddInsErrorMessage" />
             }
 
         </form>
@@ -67,7 +65,7 @@
     private GlobalState _globalState { get; set; }
     private bool _showAddCofeeDialog { get; set; }
     private List<AddIns> _addins { get; set; }
-    private string _addUserErrorMessage { get; set; }
+    private string _addAddInsErrorMessage { get; set; }
     private string _dialogTitle { get; set; }
     private string _dialogOkLabel { get; set; }
 
@@ -77,6 +75,8 @@
     }
     private void OpenAddinsDialog()
     {
+        _dialogTitle = "Add AddIns";
+        _dialogOkLabel = "Add";
         _showAddCofeeDialog = true;
         _name = "";
         _price = "";
@@ -94,7 +94,7 @@
         {
             try
             {
-                _addUserErrorMessage = "";
+                _addAddInsErrorMessage = "";
                 if (!string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(_price.ToString()))
                 {
                     List<AddIns> addin = AddInsService.GetAll();
@@ -141,15 +141,15 @@
             }
             catch (Exception e)
             {
-                _addUserErrorMessage = e.Message;
+                _addAddInsErrorMessage = e.Message;
             }
         }
     }
 
     private void OpenEditAddInsDialog(AddIns ad)
     {
-        _dialogTitle = "Edit Todo";
-        _dialogOkLabel = "Save";
+        _dialogTitle = "Edit AddIns";
+        _dialogOkLabel = "Update";
         _name = ad.Name;
         _price =ad.Price;
         _id = ad.Id;
@@ -178,9 +178,9 @@
             _addins = AddInsService.GetAll();
 
         }
-        catch
+        catch (Exception e)
         {
-            
+            _addAddInsErrorMessage = e.Message;
         }
        
 

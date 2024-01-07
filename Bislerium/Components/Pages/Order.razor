@@ -43,7 +43,7 @@
 </table>
 @if (_showAddOrderDialog)
 {
-    <ModalDialog Title="Add User" OnClose="@OnAddOrderDialogClose" OkLabel="Add">
+    <ModalDialog Title="@_dialogTitle" OkLabel="@_dialogOkLabel" OnClose="@OnAddOrderDialogClose">
         <form>
             
             <div class="form-floating mb-1">
@@ -83,11 +83,11 @@
                <label>Discount: @_discount</label><br>
                <label>Total: @Total</label>
             </div>
-            
 
-            @if (!string.IsNullOrEmpty(_addUserErrorMessage))
+
+            @if (!string.IsNullOrEmpty(_addOrderErrorMessage))
             {
-                <AlertMessage Type="danger" Message="@_addUserErrorMessage" />
+                <AlertMessage Type="danger" Message="@_addOrderErrorMessage" />
             }
 
         </form>
@@ -104,7 +104,7 @@
     private GlobalState _globalState { get; set; }
     private bool _showAddOrderDialog { get; set; }
     private List<Coffees> _coffee { get; set; }
-    private string _addUserErrorMessage { get; set; }
+    private string _addOrderErrorMessage { get; set; }
     private string _dialogTitle { get; set; }
     private string _dialogOkLabel { get; set; }
     private List<Customers> _customer { get; set; }
@@ -122,6 +122,8 @@
     }
     private void OpenAddCoffeeDialog()
     {
+        _dialogTitle = "Add Order";
+        _dialogOkLabel = "Add";
         _showAddOrderDialog = true;
 
         _id = null;
@@ -141,7 +143,7 @@
         {
             try
             {
-                _addUserErrorMessage = "";
+                _addOrderErrorMessage = "";
                 if (!string.IsNullOrEmpty(_cusName) && !string.IsNullOrEmpty(_coffName.ToString()))
                 {
                     List<Orders> ord = OrderService.GetAll();
@@ -202,17 +204,15 @@
             }
             catch (Exception e)
             {
-                _addUserErrorMessage = e.Message;
+                _addOrderErrorMessage = e.Message;
             }
         }
     }
 
     private void OpenEditOrderDialog(Coffees coff)
     {
-        _dialogTitle = "Edit Todo";
-        _dialogOkLabel = "Save";
-        // _name = coff.Name;
-        // _price =coff.Price;
+        _dialogTitle = "Edit Order";
+        _dialogOkLabel = "Update";
         _id = coff.Id;
 
         _showAddOrderDialog = true;
@@ -239,9 +239,9 @@
             _coffee = CoffeeService.GetAll();
 
         }
-        catch
+        catch (Exception e)
         {
-
+            _addOrderErrorMessage = e.Message;
         }
 
 
