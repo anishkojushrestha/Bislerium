@@ -63,6 +63,7 @@
 
         </form>
     </ModalDialog>
+   
 }
 @code {
     [CascadingParameter]
@@ -76,7 +77,7 @@
     private List<User> _users { get; set; }
     private Guid? _id { get; set; } = null;
     private Role _role { get; set; }
-    
+
     protected override void OnInitialized()
     {
         _users = UserService.GetAll();

@@ -9,6 +9,9 @@
         <span class="oi oi-plus" /> Add
     </button>
 </nav>
+<button @onclick="BubbleSort">
+    Bubble Short
+</button>
 <table class="table">
     <thead>
         <tr>
@@ -120,6 +123,35 @@
 
 
     }
+    private void BubbleSort()
+    {
+        List<Orders> cus = OrderService.GetAll();
+
+        List<string> customerNumbers = cus.Select(c => c.CustomerNumber).ToList();
+
+        bool flag = true;
+        int numLength = customerNumbers.Count;
+
+        for (int i = 1; (i <= (numLength - 1)) && flag; i++)
+        {
+            flag = false;
+            for (int j = 0; j < (numLength - 1); j++)
+            {
+                if (customerNumbers[j + 1].CompareTo(customerNumbers[j]) > 0)
+                {
+                    string temp = customerNumbers[j];
+                    customerNumbers[j] = customerNumbers[j + 1];
+                    customerNumbers[j + 1] = temp;
+                    flag = true;
+                }
+            }
+        }
+
+        List<Orders> sortedOrders = customerNumbers.Select(cn => cus.First(c => c.CustomerNumber == cn)).ToList();
+        _order = sortedOrders;
+
+    }
+
     private void OpenAddCoffeeDialog()
     {
         _dialogTitle = "Add Order";
