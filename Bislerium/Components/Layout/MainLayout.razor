@@ -7,15 +7,10 @@
     @if (_globalState.CurrentUser != null)
     {
         <div class="sidebar">
-            <NavMenu Username="@_globalState.CurrentUser.Username"  UserRole="@_globalState.CurrentUser.role" LogoutHandler="LogoutHandler" />
+            <NavMenu Username="@_globalState.CurrentUser.Username" UserRole="@_globalState.CurrentUser.role" LogoutHandler="LogoutHandler" />
         </div>
     }
-
     <main>
-        @* <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div> *@
-
         <article class="content px-4">
             <CascadingValue Value="@_globalState">
                 @Body

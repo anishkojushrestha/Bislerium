@@ -11,8 +11,7 @@
     .nav-item-custom {
         display: flex;
         align-items: center;
-        padding: 1rem 1rem; 
-
+        padding: 1rem 1rem;
     }
 </style>
 
@@ -32,26 +31,26 @@
         {
             <div class="nav-item-custom">
                 <NavLink class="nav-link" href="users" style="color: sandybrown;">
-                <span class="bi bi-people-fill" style="color: white;"></span> Users
-            </NavLink>
-        </div>
-        <div class="nav-item-custom" >
-            <NavLink class="nav-link" href="coffee" style="color: sandybrown;">
-                <span class="bi bi-cup-fill" style="color: white;"></span> Coffee
-            </NavLink>
-        </div>
-        <div class="nav-item-custom">
-            <NavLink class="nav-link" href="add-ins" style="color: sandybrown;">
-                <span class="bi bi-plus-circle-fill" style="color: white;"></span> Add-ins
-            </NavLink>
-        </div>
+                    <span class="bi bi-people-fill" style="color: white;"></span> Users
+                </NavLink>
+            </div>
+            <div class="nav-item-custom">
+                <NavLink class="nav-link" href="coffee" style="color: sandybrown;">
+                    <span class="bi bi-cup-fill" style="color: white;"></span> Coffee
+                </NavLink>
+            </div>
+            <div class="nav-item-custom">
+                <NavLink class="nav-link" href="add-ins" style="color: sandybrown;">
+                    <span class="bi bi-plus-circle-fill" style="color: white;"></span> Add-ins
+                </NavLink>
+            </div>
         }
         <div class="nav-item-custom">
             <NavLink class="nav-link text-danger" role="button" @onclick="LogoutHandler">
                 <span class="bi bi-box-arrow-right" /> Logout
             </NavLink>
         </div>
-        
+
     </nav>
 </div>
 @code {

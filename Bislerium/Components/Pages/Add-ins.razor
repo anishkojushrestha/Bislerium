@@ -25,15 +25,15 @@
                 <td>@data.Name</td>
                 <td>@data.Price</td>
                 <td>@data.CreatedAt.ToShortDateString()</td>
-            <td>
-            <button class="btn btn-outline-secondary" type="button"
+                <td>
+                    <button class="btn btn-outline-secondary" type="button"
                             @onclick="()=>OpenEditAddInsDialog(data)">
-            <span class="oi oi-pencil" /> Edit
-            </button>
+                        <span class="oi oi-pencil" /> Edit
+                    </button>
                     <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteAddInsDialog(data)">
-            <span class="oi oi-delete" /> Delete
-            </button>
-            </td>
+                        <span class="oi oi-delete" /> Delete
+                    </button>
+                </td>
             </tr>
         }
     </tbody>
@@ -151,7 +151,7 @@
         _dialogTitle = "Edit AddIns";
         _dialogOkLabel = "Update";
         _name = ad.Name;
-        _price =ad.Price;
+        _price = ad.Price;
         _id = ad.Id;
 
         _showAddCofeeDialog = true;
@@ -182,7 +182,7 @@
         {
             _addAddInsErrorMessage = e.Message;
         }
-       
+
 
     }
 }

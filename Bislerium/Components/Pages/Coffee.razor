@@ -15,7 +15,6 @@
             <th>Name</th>
             <th>Price</th>
             <th>Created At</th>
-            @* <th>CreatedBy</th> *@
             <th>Actions</th>
         </tr>
     </thead>
@@ -27,15 +26,15 @@
                 <td>@data.Price</td>
                 <td>@data.CreatedAt.ToShortDateString()</td>
                 @* <td>@data.CreatedBy</td> *@
-            <td>
-            <button class="btn btn-outline-secondary" type="button"
+                <td>
+                    <button class="btn btn-outline-secondary" type="button"
                             @onclick="()=>OpenEditCoffeeDialog(data)">
-            <span class="oi oi-pencil" /> Edit
-            </button>
+                        <span class="oi oi-pencil" /> Edit
+                    </button>
                     <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteCoffeeDialog(data)">
-            <span class="oi oi-delete" /> Delete
-            </button>
-            </td>
+                        <span class="oi oi-delete" /> Delete
+                    </button>
+                </td>
             </tr>
         }
     </tbody>
@@ -153,7 +152,7 @@
         _dialogTitle = "Edit Coffee";
         _dialogOkLabel = "Update";
         _name = coff.Name;
-        _price =coff.Price;
+        _price = coff.Price;
         _id = coff.Id;
 
         _showAddCofeeDialog = true;
@@ -184,7 +183,7 @@
         {
             _addCoffErrorMessage = e.Message;
         }
-       
+
 
     }
 }

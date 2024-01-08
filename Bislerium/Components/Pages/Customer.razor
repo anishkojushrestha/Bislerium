@@ -16,7 +16,6 @@
             <th>Number</th>
             <th>Status</th>
             <th>Created At</th>
-            @* <th>CreatedBy</th> *@
             <th>Actions</th>
         </tr>
     </thead>
@@ -28,16 +27,15 @@
                 <td>@data.Number</td>
                 <td>@data.Status</td>
                 <td>@data.CreatedAt.ToShortDateString()</td>
-                @* <td>@data.CreatedBy</td> *@
-            <td>
-            <button class="btn btn-outline-secondary" type="button"
+                <td>
+                    <button class="btn btn-outline-secondary" type="button"
                             @onclick="()=>OpenEditCustomerDialog(data)">
-            <span class="oi oi-pencil" /> Edit
-            </button>
+                        <span class="oi oi-pencil" /> Edit
+                    </button>
                     <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteCustomerDialog(data)">
-            <span class="oi oi-delete" /> Delete
-            </button>
-            </td>
+                        <span class="oi oi-delete" /> Delete
+                    </button>
+                </td>
             </tr>
         }
     </tbody>
@@ -51,14 +49,14 @@
                 <label for="floatingInput">Name</label>
             </div>
             <div class="form-floating mb-3">
-                <input type="number" class="form-control "  @bind="_number" placeholder="Number" />
+                <input type="number" class="form-control " @bind="_number" placeholder="Number" />
                 <label for="floatingPassword">Number</label>
             </div>
             <div class="form-floating mb-3">
-                <select class="form-select" @bind="_status" >
+                <select class="form-select" @bind="_status">
                     <option>Select Status</option>
-                    <option >Normal</option>
-                    <option >Member</option>
+                    <option>Normal</option>
+                    <option>Member</option>
                 </select>
                 <label for="floatingPassword">Status</label>
             </div>
@@ -115,15 +113,16 @@
 
                     if (string.IsNullOrEmpty(_id.ToString()))
                     {
-                        if (checkNumb == null) { 
+                        if (checkNumb == null)
+                        {
                             cus.Add(
                                 new Customers
-                                {
-                                    Name = _name,
-                                    Number = _number,
-                                    CreatedAt = DateTime.Now,
-                                    Status = _status,
-                                }
+                                    {
+                                        Name = _name,
+                                        Number = _number,
+                                        CreatedAt = DateTime.Now,
+                                        Status = _status,
+                                    }
                                 );
                         }
                         else
@@ -204,7 +203,7 @@
         {
             _addCustomerErrorMessage = e.Message;
         }
-       
+
 
     }
 }
