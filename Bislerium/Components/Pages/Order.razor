@@ -12,11 +12,12 @@
 <button @onclick="BubbleSort">
     Bubble Short
 </button>
+<input type="text" @oninput="SearchTaskName">
 <table class="table">
     <thead>
         <tr>
             <th style="width: 10%; white-space: nowrap;">Customer Name</th>
-            <th style ="width: 10%; white-space: nowrap;">Customer No.</th>
+            <th style="width: 10%; white-space: nowrap;">Customer No.</th>
             <th style="width: 10%; white-space: nowrap;">Coffee</th>
             <th style="width: 10%; white-space: nowrap;">Add-Ins</th>
             <th style="width: 10%; white-space: nowrap;">Discount</th>
@@ -28,7 +29,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var data in _order)
+        @foreach (var data in _order)
         {
             <tr>
                 <td>@data.CustomerName</td>
@@ -47,10 +48,10 @@
 {
     <ModalDialog Title="@_dialogTitle" OkLabel="@_dialogOkLabel" OnClose="@OnAddOrderDialogClose">
         <form>
-            
+
             <div class="form-floating mb-1">
-                <select class="form-select" @onchange="CoffCalculate" >
-                    <option selected >select Coffee</option>
+                <select class="form-select" @onchange="CoffCalculate">
+                    <option selected>select Coffee</option>
                     @foreach (var c in _coffee)
                     {
                         <option>@c.Name</option>
@@ -59,7 +60,7 @@
                 <label for="floatingPassword">Coffee</label>
             </div>
             <div class="form-floating mb-1">
-                <select class="form-select" @onchange="AddInCalculate" >
+                <select class="form-select" @onchange="AddInCalculate">
                     <option selected>select Add-Ins</option>
                     @foreach (var c in _addins)
                     {
@@ -80,10 +81,10 @@
                 <label for="floatingInput">Customer</label>
             </div>
             <div style="text-align:right;">
-               <label>Coffee Price: @CoffCal</label><br>
-               <label>Add-Ins Price: @AddInCal</label><br>
-               <label>Discount: @_discount</label><br>
-               <label>Total: @Total</label>
+                <label>Coffee Price: @CoffCal</label><br>
+                <label>Add-Ins Price: @AddInCal</label><br>
+                <label>Discount: @_discount</label><br>
+                <label>Total: @Total</label>
             </div>
 
 
@@ -97,6 +98,7 @@
 }
 @code {
     private Guid? _id { get; set; } = null;
+    private string _search { get; set; }
     private string _cusName { get; set; }
     private string _cusNumber { get; set; }
     private string _coffName { get; set; }
@@ -118,10 +120,19 @@
     int Count = 0;
     protected override void OnInitialized()
     {
-        _order =OrderService.GetAll();
+        _order = OrderService.GetAll();
 
 
     }
+    private void SearchTaskName(ChangeEventArgs e)
+    {
+        var searchTerm = e.Value.ToString();
+        _order = OrderService.GetAll().Where(t =>
+            t.CustomerName.ToLower().Contains(searchTerm.ToLower())).ToList();
+        
+        
+    }
+
     private void BubbleSort()
     {
         List<Orders> cus = OrderService.GetAll();
@@ -288,7 +299,7 @@
         _cusName = c.Name;
         _status = c.Status;
         decimal Sum = CoffCal + AddInCal;
-        if(o == 10)
+        if (o == 10)
         {
             _discount = "free";
             Total = 0;
@@ -307,7 +318,7 @@
                 Total = Sum;
             }
         }
-        
+
 
 
     }
@@ -321,7 +332,7 @@
         {
             decimal price = Convert.ToDecimal(data.Price);
             CoffCal = price;
-            
+
         }
 
 
@@ -336,7 +347,7 @@
         {
             decimal price = Convert.ToDecimal(data.Price);
             AddInCal = price;
-            
+
         }
     }
 }

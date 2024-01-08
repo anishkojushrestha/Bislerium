@@ -38,7 +38,7 @@ namespace Bislerium.Data
             public static string HasdPassword(string password)
     */
     {
-
+       
         public static string HasdPassword(string password)
         {
             var sha = SHA256.Create();
@@ -73,6 +73,7 @@ namespace Bislerium.Data
         {
             return Path.Combine(GetAppDirectoryPath(), "Orders.json");
         }
+        
         public static void DeleteUsersFile()
         {
             string filePath = GetAppUsersFilePath();
