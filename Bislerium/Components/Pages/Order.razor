@@ -1,8 +1,15 @@
 ﻿@page "/customerorder"
 @using Bislerium.Data
 @using System.Text.Json
+@using iTextSharp.text
+@using iTextSharp.text.pdf
+@inject IJSRuntime JSRuntime
 
 
+@if (!string.IsNullOrEmpty(_addOrderErrorMessage))
+{
+    <AlertMessage Type="danger" Message="@_addOrderErrorMessage" />
+}
 <nav class="navbar navbar-light bg-light justify-content-between">
     <h1 class="navbar-brand mb-0 h1">Order</h1>
     <button class="btn btn-primary" type="button" @onclick="OpenAddCoffeeDialog">
@@ -12,6 +19,8 @@
 <button @onclick="BubbleSort">
     Bubble Short
 </button>
+<input type="date" @bind="_date" />
+<button @onclick="GeneratePDF">pdf gerate</button>
 <input type="text" @oninput="SearchTaskName">
 <table class="table">
     <thead>
@@ -96,9 +105,24 @@
         </form>
     </ModalDialog>
 }
+<script>
+    window.saveAsFile = function (fileName, byteBase64, contentType) {
+        try {
+            const link = document.createElement('a');
+            link.href = `data:${contentType};base64,${byteBase64}`;
+            link.download = fileName;
+            link.click();
+            alert('pdf has generated');
+        } catch (error) {
+            console.error('Error occurred during file download:', error);
+            alert('Error occurred during file download:');
+        }
+    };
+
+</script>
 @code {
     private Guid? _id { get; set; } = null;
-    private string _search { get; set; }
+    private DateTime? _date { get; set; } 
     private string _cusName { get; set; }
     private string _cusNumber { get; set; }
     private string _coffName { get; set; }
@@ -124,6 +148,69 @@
 
 
     }
+    private async Task GeneratePDF()
+    {
+        List<Orders> cus = OrderService.GetAll();
+
+        // Filter orders for the specified date (_date)
+        List<Orders> customerDate = cus.Where(x =>
+     (x.CreatedAt != null && x.CreatedAt.Date.ToString("dd/MM/yyyy") == (_date.HasValue ? _date.Value.Date.ToString("dd/MM/yyyy") : DateTime.Now.Date.ToString("dd/MM/yyyy")))
+     ).ToList();
+        try
+        {
+            _addOrderErrorMessage = "";
+
+            if (customerDate.Count != 0)
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    Document document = new Document();
+                    PdfWriter.GetInstance(document, memoryStream);
+                    document.Open();
+
+                    // Create a table in the PDF and add data based on the fetched orders
+                    PdfPTable table = new PdfPTable(5); // Assuming 5 columns for demonstration
+
+                    // Add headers to the table
+                    table.AddCell("Customer Name");
+                    table.AddCell("Customer Number");
+                    table.AddCell("Coffee");
+                    table.AddCell("Add-Ins");
+                    table.AddCell("Total");
+
+                    // Add data rows for each order in customerDate list
+                    foreach (var order in customerDate)
+                    {
+                        table.AddCell(order.CustomerName); // Replace with actual properties from Orders
+                        table.AddCell(order.CustomerNumber.ToString()); // Replace with actual properties from Orders
+                        table.AddCell(order.CoffeeName); // Replace with actual properties from Orders
+                        table.AddCell(order.AddInsName); // Replace with actual properties from Orders
+                        table.AddCell(order.TotalPrice); // Replace with actual properties from Orders
+                    }
+
+                    document.Add(table);
+                    document.Close();
+
+                    byte[] bytes = memoryStream.ToArray();
+                    memoryStream.Close();
+
+
+                    string fileName = $"MonthlyReport_{_date?.ToString("yyyyMMdd") ?? DateTime.MinValue.ToString("yyyyMMdd")}.pdf";
+
+                    await JSRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bytes), "application/pdf");
+                }
+            }
+            else
+            {
+                throw new Exception("There is no any data");
+            }
+        }
+        catch (Exception e)
+        {
+            _addOrderErrorMessage = e.Message;
+        }
+    }
+
     private void SearchTaskName(ChangeEventArgs e)
     {
         var searchTerm = e.Value.ToString();
