@@ -127,7 +127,7 @@
             link.href = `data:${contentType};base64,${byteBase64}`;
             link.download = fileName;
             link.click();
-            alert('pdf has generated');
+            alert('pdf has generated and downloaded to download... ');
         } catch (error) {
             console.error('Error occurred during file download:', error);
             alert('Error occurred during file download:');
@@ -163,10 +163,11 @@
 
 
     }
+    
     private async Task GeneratePDF()
     {
         List<Orders> cus = OrderService.GetAll();
-
+        decimal revnue = 0;
         // Filter orders for the specified date (_date)
         List<Orders> customerDate = cus.Where(x =>
      (x.CreatedAt != null && x.CreatedAt.Date.ToString("dd/MM/yyyy") == (_date.HasValue ? _date.Value.Date.ToString("dd/MM/yyyy") : DateTime.Now.Date.ToString("dd/MM/yyyy")))
@@ -184,7 +185,7 @@
                     document.Open();
 
                     // Create a table in the PDF and add data based on the fetched orders
-                    PdfPTable table = new PdfPTable(5); // Assuming 5 columns for demonstration
+                    PdfPTable table = new PdfPTable(6); // Assuming 5 columns for demonstration
 
                     // Add headers to the table
                     table.AddCell("Customer Name");
@@ -192,17 +193,26 @@
                     table.AddCell("Coffee");
                     table.AddCell("Add-Ins");
                     table.AddCell("Total");
+                    table.AddCell("Date");
+
 
                     // Add data rows for each order in customerDate list
                     foreach (var order in customerDate)
                     {
+                        revnue = revnue + Convert.ToDecimal(order.TotalPrice);
                         table.AddCell(order.CustomerName); // Replace with actual properties from Orders
                         table.AddCell(order.CustomerNumber.ToString()); // Replace with actual properties from Orders
                         table.AddCell(order.CoffeeName); // Replace with actual properties from Orders
                         table.AddCell(order.AddInsName); // Replace with actual properties from Orders
                         table.AddCell(order.TotalPrice); // Replace with actual properties from Orders
+                        table.AddCell(order.CreatedAt.ToString("dd/mm/yyyy")); // Replace with actual properties from Orders
                     }
-
+                    table.AddCell("");
+                    table.AddCell("Revnue");
+                    table.AddCell("");
+                    table.AddCell("");
+                    table.AddCell(revnue.ToString());
+                    table.AddCell("");
                     document.Add(table);
                     document.Close();
 
@@ -210,7 +220,7 @@
                     memoryStream.Close();
 
 
-                    string fileName = $"MonthlyReport_{_date?.ToString("yyyyMMdd") ?? DateTime.MinValue.ToString("yyyyMMdd")}.pdf";
+                    string fileName = $"DailyReport_{_date?.ToString("yyyyMMdd") ?? DateTime.MinValue.ToString("yyyyMMdd")}.pdf";
 
                     await JSRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bytes), "application/pdf");
                 }
@@ -226,6 +236,7 @@
         }
     }
 
+    //Search Order table
     private void SearchTaskName(ChangeEventArgs e)
     {
         var searchTerm = e.Value.ToString();
@@ -235,6 +246,7 @@
 
     }
 
+    //shorting
     private void SortOrders(SortDirection direction)
     {
         if (direction == SortDirection.Ascending)
@@ -295,6 +307,8 @@
         _addins = AddInsService.GetAll();
 
     }
+
+    //Add Order
     private void OnAddOrderDialogClose(bool isCancel)
     {
         if (isCancel)
