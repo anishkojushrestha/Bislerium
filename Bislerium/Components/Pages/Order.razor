@@ -16,12 +16,28 @@
         <span class="oi oi-plus" /> Add
     </button>
 </nav>
-<button @onclick="BubbleSort">
-    Bubble Short
-</button>
-<input type="date" @bind="_date" />
-<button @onclick="GeneratePDF">pdf gerate</button>
-<input type="text" @oninput="SearchTaskName">
+<div class="d-flex flex-row align-items-center mb-3">
+    <!-- Sort Dropdown -->
+    <div class="dropdown me-2">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Sort
+        </button>
+        <ul class="dropdown-menu">
+            <li><button class="dropdown-item" @onclick="() => SortOrders(SortDirection.Ascending)">Ascending</button></li>
+            <li><button class="dropdown-item" @onclick="() => SortOrders(SortDirection.Descending)">Descending</button></li>
+        </ul>
+    </div>
+
+    <!-- Search Input -->
+    <input type="text" @oninput="SearchTaskName" class="form-control me-2" placeholder="Search..." style="width: auto;" />
+
+    <!-- Date Picker -->
+    <input type="date" @bind="_date" class="form-control me-2" style="width: auto;" />
+
+    <!-- PDF Generate Button -->
+    <button class="btn btn-outline-success" @onclick="GeneratePDF">PDF Generate</button>
+</div>
+
 <table class="table">
     <thead>
         <tr>
@@ -121,7 +137,7 @@
 </script>
 @code {
     private Guid? _id { get; set; } = null;
-    private DateTime? _date { get; set; } 
+    private DateTime? _date { get; set; }
     private string _cusName { get; set; }
     private string _cusNumber { get; set; }
     private string _coffName { get; set; }
@@ -215,8 +231,27 @@
         var searchTerm = e.Value.ToString();
         _order = OrderService.GetAll().Where(t =>
             t.CustomerName.ToLower().Contains(searchTerm.ToLower())).ToList();
-        
-        
+
+
+    }
+
+    private void SortOrders(SortDirection direction)
+    {
+        if (direction == SortDirection.Ascending)
+        {
+            _order = _order.OrderBy(o => o.CustomerName).ToList();
+        }
+        else if (direction == SortDirection.Descending)
+        {
+            _order = _order.OrderByDescending(o => o.CustomerName).ToList();
+        }
+    }
+
+
+    private enum SortDirection
+    {
+        Ascending,
+        Descending
     }
 
     private void BubbleSort()
